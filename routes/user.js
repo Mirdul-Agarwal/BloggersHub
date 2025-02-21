@@ -12,11 +12,21 @@ router.get("/signup",(req,res)=>{
 })
 //user signin
 router.post("/signin",async(req,res)=>{
-    const { email, password } = req.body;
-   const user =  await User.matchPassword(email, password);
-
-   console.log("user",user);
-   return res.redirect("/");
+   const { email, password } = req.body;
+   try {
+    const token =  await User.matchPasswordAndGenrateToken(email, password);
+    return res.cookie('token',token).redirect("/");
+    
+   } catch (error) {
+    return res.render("signin",{
+        error: "Incorrect Credentials",
+    });
+    
+   }
+})
+//logout
+router.get("/logout",(req,res)=>{
+    res.clearCookie('token').redirect("/");
 })
 
 
@@ -30,6 +40,8 @@ router.post("/signup",async(req,res)=>{
     });
     return res.redirect("/");
 })
+
+
 
 
 
